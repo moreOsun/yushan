@@ -1,0 +1,17 @@
+{
+  "name": "御膳小册 Yushan",
+  "short_name": "御膳小册",
+  "description": "本地存满千家味，灶台边的御膳册 — 家常菜谱与冰箱食材匹配助手，离线可用。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbf6f0",
+  "theme_color": "#e8743b",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
