@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#e8743b">
+  <meta name="application-name" content="御膳小册">
+  <meta name="description" content="御膳小册 Yushan — 本地存满千家味，灶台边的御膳册。家常菜谱与冰箱食材匹配助手，完全离线可用。">
+  <meta name="app-version" content="v1.4.0">
+  <title>御膳小册 · 做饭助手</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ============ 智能匹配（首屏） ============ -->
+  <section id="xc-view-match" class="xc-view xc-active">
+    <header class="xc-hd">
+      <div class="xc-brand">御膳小册<span class="xc-brand-en">Yushan</span></div>
+      <h1>今天吃什么</h1>
+      <p class="xc-hd-sub" id="xc-match-sub">先录入冰箱食材，帮你算出能做的菜</p>
+    </header>
+    <main class="xc-body">
+      <!-- 今日膳语 -->
+      <div class="xc-card xc-quote" id="xc-quote-card">
+        <div class="xc-quote-hd">
+          <span class="xc-quote-style">今日膳语</span>
+          <span class="xc-quote-date" id="xc-quote-date"></span>
+          <button type="button" id="xc-quote-swap" class="xc-quote-swap" title="换一句今天的膳语">换一句 ⟳</button>
+        </div>
+        <p class="xc-quote-text" id="xc-quote-text">--</p>
+      </div>
+      <!-- 冰箱概览 -->
+      <div class="xc-card xc-fridge-brief" id="xc-brief-card">
+        <div class="xc-brief-row">
+          <div class="xc-brief-num"><b id="xc-brief-count">0</b><span>种食材</span></div>
+          <div class="xc-brief-num"><b id="xc-brief-full">0</b><span>道可做</span></div>
+          <div class="xc-brief-num"><b id="xc-brief-near">0</b><span>差一点</span></div>
+          <button type="button" class="xc-btn-mini" data-nav="xc-view-fridge">管理冰箱 ›</button>
+        </div>
+      </div>
+
+      <!-- 匹配筛选 -->
+      <div class="xc-card">
+        <h3 class="xc-card-title">匹配结果 <small id="xc-match-rule">已算上常备调料</small></h3>
+        <div class="xc-chip-row" id="xc-seg-match">
+          <button data-level="all">全部</button>
+          <button data-level="full" class="xc-on">食材齐全</button>
+          <button data-level="near">只差 1 样</button>
+          <button data-level="miss">缺料较多</button>
+        </div>
+        <label class="xc-switch-row">
+          <span>只推主料齐全的（缺配料也算）</span>
+          <i class="xc-switch" id="xc-sw-mainonly" role="switch" aria-label="只看主料齐全"></i>
+        </label>
+        <div class="xc-lucky">
+          <button type="button" id="xc-btn-lucky" class="xc-btn-primary">🎲 随机选一道</button>
+          <p class="xc-tip">选择困难时交给运气，从“食材齐全”的菜里随机。</p>
+        </div>
+      </div>
+
+      <!-- 结果列表（固定高度，在列表内下滑） -->
+      <ul id="xc-match-list" class="xc-dish-list xc-scroll"></ul>
+      <p id="xc-match-more" class="xc-scroll-tip xc-hidden"></p>
+      <div id="xc-match-empty" class="xc-empty xc-hidden">
+        <p id="xc-match-empty-tip">冰箱还空着</p>
+        <button class="xc-btn-ghost" data-nav="xc-view-fridge">去录入食材 →</button>
+      </div>
+
+      <footer class="xc-foot">
+        <p class="xc-motto">本地存满千家味 · 灶台边的御膳册</p>
+        <p id="xc-version-line-home" class="xc-version-line">御膳小册 Yushan</p>
+      </footer>
+      <br>
+    </main>
+  </section>
+
+  <!-- ============ 冰箱 ============ -->
+  <section id="xc-view-fridge" class="xc-view">
+    <header class="xc-hd">
+      <h1>我的冰箱</h1>
+      <p class="xc-hd-sub" id="xc-fridge-sub">共 0 种食材</p>
+    </header>
+    <main class="xc-body">
+      <div class="xc-card">
+        <div class="xc-add-row">
+          <input type="text" id="xc-fri-input" maxlength="12" placeholder="输入食材名，如 五花肉" autocomplete="off">
+          <button type="button" id="xc-btn-add-item" class="xc-btn-primary">添加</button>
+        </div>
+        <div class="xc-chip-row" id="xc-quick-group"></div>
+        <p class="xc-tip">点下面常用食材可快速入库；同名食材会累加数量。</p>
+      </div>
+
+      <div class="xc-card">
+        <h3 class="xc-card-title xc-has-link">存货清单 <small id="xc-fri-count"></small>
+          <button type="button" id="xc-btn-clear-fri" class="xc-btn-link">清空</button>
+        </h3>
+        <div id="xc-fridge-groups"></div>
+      </div>
+
+      <div class="xc-card">
+        <h3 class="xc-card-title">常备调料（永远视为有）</h3>
+        <div class="xc-chip-row xc-chip-edit" id="xc-pantry-chips"></div>
+        <div class="xc-add-row">
+          <input type="text" id="xc-pantry-input" maxlength="8" placeholder="添加一种常备调料" autocomplete="off">
+          <button type="button" id="xc-btn-add-pantry" class="xc-btn-ghost">加入</button>
+        </div>
+        <p class="xc-tip">油盐糖酱醋这类基础调料，不必每次录入冰箱，匹配时会自动算作“已有”。</p>
+      </div>
+      <br>
+    </main>
+  </section>
+
+  <!-- ============ 菜单库 ============ -->
+  <section id="xc-view-menu" class="xc-view">
+    <header class="xc-hd">
+      <h1>家常菜单</h1>
+      <div class="xc-search-row">
+        <input type="search" id="xc-menu-search" placeholder="搜菜名 / 食材，如 鸡蛋" autocomplete="off">
+      </div>
+    </header>
+    <main class="xc-body">
+      <div class="xc-chip-row" id="xc-seg-cat"></div>
+      <ul id="xc-menu-list" class="xc-dish-list"></ul>
+      <div id="xc-menu-empty" class="xc-empty xc-hidden"><p>没有匹配的菜品</p></div>
+      <footer class="xc-foot">
+        <p class="xc-motto">本地存满千家味 · 灶台边的御膳册</p>
+        <p id="xc-version-line" class="xc-version-line">御膳小册 Yushan</p>
+      </footer>
+      <br>
+    </main>
+  </section>
+
+  <!-- ============ 烹饪技巧 ============ -->
+  <section id="xc-view-tips" class="xc-view">
+    <header class="xc-hd">
+      <h1>烹饪技巧</h1>
+      <p class="xc-hd-sub">火候、调味、去腥、上浆，一次讲清</p>
+    </header>
+    <main class="xc-body">
+      <div class="xc-chip-row" id="xc-seg-topic"></div>
+      <div id="xc-tip-list"></div>
+      <div class="xc-card">
+        <h3 class="xc-card-title">厨房口诀</h3>
+        <ul id="xc-maxim-list" class="xc-maxim-list"></ul>
+      </div>
+      <br>
+    </main>
+  </section>
+
+  <!-- ============ 菜谱详情弹层 ============ -->
+  <div id="xc-modal-dish" class="xc-modal xc-hidden">
+    <div class="xc-modal-panel">
+      <div class="xc-dish-hd">
+        <h2 id="xc-d-name">--</h2>
+        <button type="button" id="xc-btn-fav" class="xc-fav">☆</button>
+      </div>
+      <div class="xc-dish-meta" id="xc-d-meta"></div>
+      <div class="xc-dish-avail" id="xc-d-avail"></div>
+      <h3 class="xc-sub-title">食材</h3>
+      <div id="xc-d-ings" class="xc-ing-grid"></div>
+      <h3 class="xc-sub-title">做法</h3>
+      <ol id="xc-d-steps" class="xc-step-list"></ol>
+      <div class="xc-dish-tip xc-hidden" id="xc-d-tipwrap">
+        <b>小贴士</b><span id="xc-d-tip"></span>
+      </div>
+      <div class="xc-modal-btns">
+        <button type="button" id="xc-btn-useup" class="xc-btn-ghost">用掉这些食材</button>
+        <button type="button" id="xc-btn-dish-close" class="xc-btn-primary">做好了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 通用确认弹框 ============ -->
+  <div id="xc-modal-confirm" class="xc-modal xc-modal-center xc-hidden">
+    <div class="xc-confirm-panel">
+      <h3 id="xc-confirm-title">请确认</h3>
+      <p id="xc-confirm-msg"></p>
+      <div class="xc-confirm-btns">
+        <button id="xc-confirm-cancel" class="xc-btn-ghost">取消</button>
+        <button id="xc-confirm-ok" class="xc-confirm-ok">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 底部导航 ============ -->
+  <nav class="xc-tabbar">
+    <button data-view="xc-view-match" class="xc-on"><span class="xc-tab-ico">🍳</span><span>今天</span></button>
+    <button data-view="xc-view-fridge"><span class="xc-tab-ico">🧊</span><span>冰箱</span></button>
+    <button data-view="xc-view-menu"><span class="xc-tab-ico">📖</span><span>菜单</span></button>
+    <button data-view="xc-view-tips"><span class="xc-tab-ico">💡</span><span>技巧</span></button>
+  </nav>
+
+  <div id="xc-toast" class="xc-toast xc-hidden"></div>
+
+  <script src="data-dishes.js"></script>
+  <script src="data-tips.js"></script>
+  <script src="data-quotes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
