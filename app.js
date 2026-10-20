@@ -60,7 +60,7 @@
   function load() {
     var raw = null;
     try { raw = localStorage.getItem(STORE_KEY); } catch (e) { raw = null; }
-    var s = { fridge: {}, pantry: PANTRY_DEF.slice(), favs: [], opt: { mainOnly: false }, matchLevel: 'full', levelV2: false };
+    var s = { fridge: {}, pantry: PANTRY_DEF.slice(), favs: [], opt: { mainOnly: false }, matchLevel: 'full', levelV2: true };
     if (raw) {
       try {
         var d = JSON.parse(raw);
@@ -71,7 +71,6 @@
         /* v1.4.0：首屏默认档从「全部」改成「食材齐全」；老数据只迁移一次，之后用户手动选的全部会保留 */
         if (d.matchLevel) s.matchLevel = d.matchLevel;
         if (d.matchLevel === 'all' && !d.levelV2) s.matchLevel = 'full';
-        s.levelV2 = true;
       } catch (e) { /* 数据损坏则回退默认 */ }
     }
     return s;
@@ -221,7 +220,7 @@
     if (more) {
       var overflow = ul.scrollHeight - ul.clientHeight > 8;
       more.classList.toggle('xc-hidden', !overflow);
-      if (overflow) more.innerHTML = '共 ' + list.length + ' 道 · 列表内可上下滑动查看';
+      more.innerHTML = overflow ? '共 ' + list.length + ' 道 · 列表内可上下滑动查看' : '';
     }
 
     var empty = list.length === 0;
@@ -713,7 +712,7 @@
     renderTips();
     renderMaxims();
 
-    var ver = 'v1.4.0';
+    var ver = 'v1.4.1';
     var meta = document.querySelector('meta[name="app-version"]');
     if (meta) ver = meta.getAttribute('content');
     on($('xc-quote-swap'), 'click', function () { quoteOffset++; renderQuote(); });
