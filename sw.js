@@ -1,5 +1,5 @@
 /* ============ 御膳小册 Yushan - Service Worker 离线缓存 ============ */
-var CACHE = 'xc-yushan-v8';
+var CACHE = 'xc-yushan-v9';
 var ASSETS = [
   './',
   './index.html',
