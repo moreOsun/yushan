@@ -214,13 +214,13 @@
     var ul = $('xc-match-list'), html = '';
     for (i = 0; i < list.length; i++) html += dishRow(list[i], true);
     ul.innerHTML = html;
-    /* 列表只占固定高度，多的菜在里面上下滑动，下面的“随机选一道”才不至于被拉太远 */
+    /* 列表只占固定高度，多的菜在里面上下滑动；滑到顶/底后滚动会自然交给整页（见 .xc-scroll 的 overscroll-behavior-y）*/
     ul.scrollTop = 0;
     var more = $('xc-match-more');
     if (more) {
       var overflow = ul.scrollHeight - ul.clientHeight > 8;
       more.classList.toggle('xc-hidden', !overflow);
-      more.innerHTML = overflow ? '共 ' + list.length + ' 道 · 列表内可上下滑动查看' : '';
+      more.innerHTML = overflow ? '共 ' + list.length + ' 道 · 在列表里滑动查看，滑到尽头整页接着滚' : '';
     }
 
     var empty = list.length === 0;
@@ -712,7 +712,7 @@
     renderTips();
     renderMaxims();
 
-    var ver = 'v1.4.1';
+    var ver = 'v1.4.2';
     var meta = document.querySelector('meta[name="app-version"]');
     if (meta) ver = meta.getAttribute('content');
     on($('xc-quote-swap'), 'click', function () { quoteOffset++; renderQuote(); });
