@@ -187,10 +187,12 @@ button, input { font-family: inherit; font-size: inherit; color: inherit; }
 
 /* ---------- 菜品列表 ---------- */
 .xc-dish-list { list-style: none; }
-/* 首屏结果列表：固定高度 + 内部下滑（一行 105.4 + 行间距10px，340px 恰好完整展示三道菜） */
+/* 首屏结果列表：固定高度 + 内部下滑（一行 105.4 + 行间距10px，340px 恰好完整展示三道菜）。
+   列表滑到顶/底之后要把滚动交还给整页，所以这里刻意不设 overscroll-behavior: contain；
+   也去掉 -webkit-overflow-scrolling: touch（iOS 13+ 已忽略它，老 iOS 留着反而会让嵌套滚动必须抬手才能继续滚外层）。 */
 .xc-dish-list.xc-scroll {
   max-height: 340px; overflow-y: auto;
-  -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  overscroll-behavior-y: auto;
   padding-right: 2px;
 }
 .xc-dish-list.xc-scroll::-webkit-scrollbar { width: 4px; }
